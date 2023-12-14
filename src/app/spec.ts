@@ -95,7 +95,7 @@ export interface InitParams {
     highlightColor?: ColorParams,
     superpositionParams?: { matrixAccession?: string, segment?: number, cluster?: number[], superposeCompleteCluster?: boolean, ligandView?: boolean, superposeAll?: boolean, ligandColor?: ColorParams },
     hideStructure?: ['polymer', 'het', 'water', 'carbs', 'nonStandard', 'coarse'],
-    visualStyle?: 'cartoon' | 'ball-and-stick',
+    visualStyle?: 'cartoon' | 'backbone',
     encoding: 'cif' | 'bcif'
     granularity?: Loci.Granularity,
     selection?: { data: QueryParam[], nonSelectedColor?: any, clearPrevious?: boolean },

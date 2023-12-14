@@ -1,0 +1,75 @@
+diff -r cmp/pdbe-molstar-1.2.0/lib/af-confidence/color.d.ts mix9/pdbe-molstar-1.2.0/lib/af-confidence/color.d.ts
+5c5
+<     type: PD.Mapped<PD.NamedParams<PD.Normalize<{
+---
+>     type: PD.Mapped<PD.NamedParams<PD.Normalize<unknown>, "score"> | PD.NamedParams<PD.Normalize<{
+7c7
+<     }>, "category"> | PD.NamedParams<PD.Normalize<unknown>, "score">>;
+---
+>     }>, "category">>;
+diff -r cmp/pdbe-molstar-1.2.0/lib/spec.d.ts mix9/pdbe-molstar-1.2.0/lib/spec.d.ts
+57c57
+<     visualStyle?: 'cartoon' | 'ball-and-stick';
+---
+>     visualStyle?: 'cartoon' | 'backbone';
+diff -r cmp/pdbe-molstar-1.2.0/src/app/index.ts mix9/pdbe-molstar-1.2.0/src/app/index.ts
+117a118,126
+> 	else
+> 	{
+>             pdbePluginSpec.layout.controls = {
+>                 left: 'none',
+>                 right: 'none',
+>                 // top: 'none',
+>                 bottom: 'none'
+>             }
+> 	}
+509c518
+<                 param.sideChain = true;
+---
+>                 param.sideChain = false;
+645a655,684
+> 	setColorScheme: async (params: { themeName?: any, cparams?: any }) => {
+>             // clear prvious selection
+> 	    //if(this.selectedParams){
+> 	    //await this.visual.clearSelection(params.structureNumber);
+> 	    //}
+> 
+> 	    //alert(params.themeName);
+>             
+>             // Structure list to apply selection
+>             let structureData = this.plugin.managers.structure.hierarchy.current.structures;
+> 	    //if(params.structureNumber) {
+> 	    //structureData = [this.plugin.managers.structure.hierarchy.current.structures[params.structureNumber - 1]];
+> 	    //}
+> 
+>             // set non selected theme color
+> 	    //if(params.nonSelectedColor) {
+>                 for await (const s of structureData) {
+>                     await this.plugin.managers.structure.component.updateRepresentationsTheme(s.components, {color: params.themeName, colorParams: params.cparams ? params.cparams : void 0});
+>                 }
+> 		//}
+> 
+> 	},
+> 	setSingleRepresentation: async (params: { repr?: any, themeName?: any, cparams?: any }) => {
+>             let structureData = this.plugin.managers.structure.hierarchy.current.structures;
+>                for await (const s of structureData) {
+> 	               await this.plugin.managers.structure.component.removeRepresentations(s.components);
+> 		       await this.plugin.managers.structure.component.addRepresentation(s.components, params.repr);
+>                        //await this.plugin.managers.structure.component.updateRepresentationsTheme(s.components, {color: params.themeName, colorParams: params.cparams ? params.cparams : void 0});
+>                }
+> 	},
+680c719
+< (window as any).PDBeMolstarPlugin = PDBeMolstarPlugin;
+\ No newline at end of file
+---
+> (window as any).PDBeMolstarPlugin = PDBeMolstarPlugin;
+diff -r cmp/pdbe-molstar-1.2.0/src/app/spec.ts mix9/pdbe-molstar-1.2.0/src/app/spec.ts
+51c51
+<     hideStructure?: ['polymer', 'het', 'water', 'carbs', 'nonStandard', 'coarse'], visualStyle?: 'cartoon' | 'ball-and-stick', encoding: 'cif' | 'bcif'
+---
+>     hideStructure?: ['polymer', 'het', 'water', 'carbs', 'nonStandard', 'coarse'], visualStyle?: 'cartoon' | 'backbone', encoding: 'cif' | 'bcif'
+88c88
+< };
+\ No newline at end of file
+---
+> };

@@ -134,6 +134,14 @@ class PDBeMolstarPlugin {
         if (this.initParams.alphafoldView) {
             pdbePluginSpec.behaviors.push(PluginSpec.Behavior(MAQualityAssessment, { autoAttach: true, showTooltip: true }));
         }
+        /*else {
+             pdbePluginSpec.layout.controls = {
+                 left: 'none',
+                 right: 'none',
+                 // top: 'none',
+                 bottom: 'none'
+             }
+ 	    }*/
 
         pdbePluginSpec.config!.push([PluginConfig.Structure.DefaultRepresentationPresetParams, {
             theme: {
@@ -545,6 +553,7 @@ class PDBeMolstarPlugin {
                 colorValue.action.params = { color: param.color ? this.normalizeColor(param.color) : Color.fromRgb(255, 112, 3), opacity: 1 };
                 await this.plugin.managers.structure.component.applyTheme(colorValue, structureData);
                 // add new representations
+                param.sideChain = false;
                 if (param.sideChain || param.representation) {
                     let repr = 'ball-and-stick';
                     if (param.representation) repr = param.representation;
@@ -682,6 +691,36 @@ class PDBeMolstarPlugin {
             if (param.select) rParam['selectColor'] = this.normalizeColor(param.select);
             PluginCommands.Canvas3D.SetSettings(this.plugin, { settings: { renderer: { ...renderer, ...rParam } } });
             if (rParam.highlightColor) this.isHighlightColorUpdated = true;
+        },
+        setColorScheme: async (params: { themeName?: any, cparams?: any }) => {
+            // clear prvious selection
+            //if(this.selectedParams){
+            //await this.visual.clearSelection(params.structureNumber);
+            //}
+
+            //alert(params.themeName);
+
+            // Structure list to apply selection
+            let structureData = this.plugin.managers.structure.hierarchy.current.structures;
+            //if(params.structureNumber) {
+            //structureData = [this.plugin.managers.structure.hierarchy.current.structures[params.structureNumber - 1]];
+            //}
+
+            // set non selected theme color
+            //if(params.nonSelectedColor) {
+            for await (const s of structureData) {
+                await this.plugin.managers.structure.component.updateRepresentationsTheme(s.components, {color: params.themeName, colorParams: params.cparams ? params.cparams : void 0});
+            }
+            //}
+
+        },
+        setSingleRepresentation: async (params: { repr?: any, themeName?: any, cparams?: any }) => {
+            let structureData = this.plugin.managers.structure.hierarchy.current.structures;
+            for await (const s of structureData) {
+                await this.plugin.managers.structure.component.removeRepresentations(s.components);
+                await this.plugin.managers.structure.component.addRepresentation(s.components, params.repr);
+                //await this.plugin.managers.structure.component.updateRepresentationsTheme(s.components, {color: params.themeName, colorParams: params.cparams ? params.cparams : void 0});
+            }
         },
         reset: async (params: { camera?: boolean, theme?: boolean, highlightColor?: boolean, selectColor?: boolean }) => {
 

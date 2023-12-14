@@ -1,0 +1,74 @@
+diff -ur pdbe_molstar_1.2/pdbe-molstar/lib/spec.d.ts pdbe-molstar/lib/spec.d.ts
+--- pdbe_molstar_1.2/pdbe-molstar/lib/spec.d.ts	2023-12-14 01:11:25.044702264 +0100
++++ pdbe-molstar/lib/spec.d.ts	2023-12-14 00:01:46.237289005 +0100
+@@ -58,7 +58,7 @@
+         ligandColor?: ColorParams;
+     };
+     hideStructure?: ['polymer', 'het', 'water', 'carbs', 'nonStandard', 'coarse'];
+-    visualStyle?: 'cartoon' | 'ball-and-stick';
++    visualStyle?: 'cartoon' | 'backbone';
+     encoding: 'cif' | 'bcif';
+     granularity?: Loci.Granularity;
+     selection?: {
+Only in pdbe-molstar/node_modules/union-value: node_modules
+diff -ur pdbe_molstar_1.2/pdbe-molstar/src/app/index.ts pdbe-molstar/src/app/index.ts
+--- pdbe_molstar_1.2/pdbe-molstar/src/app/index.ts	2023-12-14 01:10:22.212548834 +0100
++++ pdbe-molstar/src/app/index.ts	2023-12-14 00:01:37.277285612 +0100
+@@ -545,6 +553,7 @@
+                 colorValue.action.params = { color: param.color ? this.normalizeColor(param.color) : Color.fromRgb(255, 112, 3), opacity: 1 };
+                 await this.plugin.managers.structure.component.applyTheme(colorValue, structureData);
+                 // add new representations
++                param.sideChain = false;
+                 if (param.sideChain || param.representation) {
+                     let repr = 'ball-and-stick';
+                     if (param.representation) repr = param.representation;
+@@ -683,6 +692,36 @@
+             PluginCommands.Canvas3D.SetSettings(this.plugin, { settings: { renderer: { ...renderer, ...rParam } } });
+             if (rParam.highlightColor) this.isHighlightColorUpdated = true;
+         },
++        setColorScheme: async (params: { themeName?: any, cparams?: any }) => {
++            // clear prvious selection
++            //if(this.selectedParams){
++            //await this.visual.clearSelection(params.structureNumber);
++            //}
++
++            //alert(params.themeName);
++
++            // Structure list to apply selection
++            let structureData = this.plugin.managers.structure.hierarchy.current.structures;
++            //if(params.structureNumber) {
++            //structureData = [this.plugin.managers.structure.hierarchy.current.structures[params.structureNumber - 1]];
++            //}
++
++            // set non selected theme color
++            //if(params.nonSelectedColor) {
++            for await (const s of structureData) {
++                await this.plugin.managers.structure.component.updateRepresentationsTheme(s.components, {color: params.themeName, colorParams: params.cparams ? params.cparams : void 0});
++            }
++            //}
++
++        },
++        setSingleRepresentation: async (params: { repr?: any, themeName?: any, cparams?: any }) => {
++            let structureData = this.plugin.managers.structure.hierarchy.current.structures;
++            for await (const s of structureData) {
++                await this.plugin.managers.structure.component.removeRepresentations(s.components);
++                await this.plugin.managers.structure.component.addRepresentation(s.components, params.repr);
++                //await this.plugin.managers.structure.component.updateRepresentationsTheme(s.components, {color: params.themeName, colorParams: params.cparams ? params.cparams : void 0});
++            }
++        },
+         reset: async (params: { camera?: boolean, theme?: boolean, highlightColor?: boolean, selectColor?: boolean }) => {
+ 
+             if (params.camera) await PluginCommands.Camera.Reset(this.plugin, { durationMs: 250 });
+diff -ur pdbe_molstar_1.2/pdbe-molstar/src/app/spec.ts pdbe-molstar/src/app/spec.ts
+--- pdbe_molstar_1.2/pdbe-molstar/src/app/spec.ts	2023-12-14 01:10:22.212548834 +0100
++++ pdbe-molstar/src/app/spec.ts	2023-12-13 23:57:44.789198517 +0100
+@@ -95,7 +95,7 @@
+     highlightColor?: ColorParams,
+     superpositionParams?: { matrixAccession?: string, segment?: number, cluster?: number[], superposeCompleteCluster?: boolean, ligandView?: boolean, superposeAll?: boolean, ligandColor?: ColorParams },
+     hideStructure?: ['polymer', 'het', 'water', 'carbs', 'nonStandard', 'coarse'],
+-    visualStyle?: 'cartoon' | 'ball-and-stick',
++    visualStyle?: 'cartoon' | 'backbone',
+     encoding: 'cif' | 'bcif'
+     granularity?: Loci.Granularity,
+     selection?: { data: QueryParam[], nonSelectedColor?: any, clearPrevious?: boolean },
+\ No newline at end of file
