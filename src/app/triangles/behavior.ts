@@ -5,21 +5,21 @@ import { StateTransformer } from 'Molstar/mol-state/transformer';
 import { Task } from 'Molstar/mol-task';
 
 import {
-    TriangleRepresentation,
-    TriangleParams
+    SurfaceRepresentation,
+    SurfaceParams
 } from './representation';
 
 const CreateTransformer = StateTransformer.builderFactory('surface-plugin');
 
 
-export const CreateTriangle = CreateTransformer({
-    name: 'create-triangle',
-    display: 'Triangle',
+export const CreateSurface = CreateTransformer({
+    name: 'create-surface',
+    display: 'Surface',
     from: PluginStateObject.Root,
     to: PluginStateObject.Shape.Representation3D,
     params: {
         index: PD.Numeric(0),
-        vertices: PD.Value([] as number[]),
+        triangles: PD.Value([] as Array<Array<Array<number>>>),
         size: PD.Numeric(1.6)
     }
 })({
@@ -27,10 +27,10 @@ export const CreateTriangle = CreateTransformer({
         return true;
     },
     apply({ a, params }, plugin: PluginContext) {
-        return Task.create('Triangle', async ctx => {
-            const repr = TriangleRepresentation({ webgl: plugin.canvas3d?.webgl, ...plugin.representation.structure.themes }, () => TriangleParams);
+        return Task.create('Surface', async ctx => {
+            const repr = SurfaceRepresentation({ webgl: plugin.canvas3d?.webgl, ...plugin.representation.structure.themes }, () => SurfaceParams);
             await repr.createOrUpdate({}, params).runInContext(ctx);
-            return new PluginStateObject.Shape.Representation3D({ repr, sourceData: a }, { label: `Triangle ${params.index}` });
+            return new PluginStateObject.Shape.Representation3D({ repr, sourceData: a }, { label: `Surface ${params.index}` });
         });
     }
 });

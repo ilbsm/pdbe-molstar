@@ -10,41 +10,41 @@ import { Shape } from 'Molstar/mol-model/shape/shape';
 
 
 
-interface TriangleData {
-    vertices: number[],
+interface SurfaceData {
+    triangles: Array<Array<Array<number>>>,
     size: number
     index: number
 }
 
-export const TriangleParams = {
+export const SurfaceParams = {
     ...Mesh.Params,
     doubleSided: PD.Boolean(true)
 };
-export type TriangleParams = typeof TriangleParams;
-export type TriangleProps = PD.Values<TriangleParams>
+export type SurfaceParams = typeof SurfaceParams;
+export type SurfaceProps = PD.Values<SurfaceParams>
 
-const TriangleVisuals = {
-    'mesh': (ctx: RepresentationContext, getParams: RepresentationParamsGetter<TriangleData, TriangleParams>) => ShapeRepresentation(getTriangleShape, Mesh.Utils)
+const SurfaceVisuals = {
+    'mesh': (ctx: RepresentationContext, getParams: RepresentationParamsGetter<SurfaceData, SurfaceParams>) => ShapeRepresentation(getSurfaceShape, Mesh.Utils)
 };
 
-function getTriangleMesh(data: TriangleData, props: TriangleProps, mesh?: Mesh) {
-    // Here I'm trying to create custom mesh from plain vertices array.
-    // Example array is simple Triangle
+function getSurfaceMesh(data: SurfaceData, props: SurfaceProps, mesh?: Mesh) {
     const state = MeshBuilder.createState(256, 128, mesh);
-    MeshBuilder.addTriangle(state,
-        Vec3.create(data.vertices[0], data.vertices[1], data.vertices[0 + 2]),
-        Vec3.create(data.vertices[3], data.vertices[4], data.vertices[5]),
-        Vec3.create(data.vertices[6], data.vertices[7], data.vertices[8]),
-    );
+    for (const triangle of data.triangles) {
+        MeshBuilder.addTriangle(state,
+            Vec3.create(triangle[0][0], triangle[0][1], triangle[0][2]),
+            Vec3.create(triangle[1][0], triangle[1][1], triangle[1][2]),
+            Vec3.create(triangle[2][0], triangle[2][1], triangle[2][2]),
+        );
+    }
     return MeshBuilder.getMesh(state);
 }
 
-function getTriangleShape(ctx: RuntimeContext, data: TriangleData, props: TriangleProps, shape?: Shape<Mesh>) {
-    const geo = getTriangleMesh(data, props, shape && shape.geometry);
-    return Shape.create(`Triangle ${data.index}`, data, geo, () => Color.fromRgb(0, 0, 0), () => data.size, () => `Triangle ${data.index}`);
+function getSurfaceShape(ctx: RuntimeContext, data: SurfaceData, props: SurfaceProps, shape?: Shape<Mesh>) {
+    const geo = getSurfaceMesh(data, props, shape && shape.geometry);
+    return Shape.create(`Surface ${data.index}`, data, geo, () => Color.fromRgb(0, 0, 0), () => data.size, () => `Surface ${data.index}`);
 }
-export type TriangleRepresentation = Representation<TriangleData, TriangleParams>
+export type SurfaceRepresentation = Representation<SurfaceData, SurfaceParams>
 
-export function TriangleRepresentation(ctx: RepresentationContext, getParams: RepresentationParamsGetter<TriangleData, TriangleParams>): TriangleRepresentation {
-    return Representation.createMulti('Triangle', ctx, getParams, Representation.StateBuilder, TriangleVisuals as unknown as Representation.Def<TriangleData, TriangleParams>);
+export function SurfaceRepresentation(ctx: RepresentationContext, getParams: RepresentationParamsGetter<SurfaceData, SurfaceParams>): SurfaceRepresentation {
+    return Representation.createMulti('Surface', ctx, getParams, Representation.StateBuilder, SurfaceVisuals as unknown as Representation.Def<SurfaceData, SurfaceParams>);
 }

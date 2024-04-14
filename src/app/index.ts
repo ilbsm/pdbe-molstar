@@ -44,7 +44,7 @@ import { LeftPanelControls } from './ui/pdbe-left-panel';
 import { PDBeLigandViewStructureTools, PDBeStructureTools, PDBeSuperpositionStructureTools } from './ui/pdbe-structure-controls';
 import { PDBeViewportControls } from './ui/pdbe-viewport-controls';
 import { SuperpostionViewport } from './ui/superposition-viewport';
-import { CreateTriangle } from './triangles/behavior';
+import { CreateSurface } from './triangles/behavior';
 
 import 'Molstar/mol-plugin-ui/skin/dark.scss';
 import './overlay.scss';
@@ -255,16 +255,22 @@ class PDBeMolstarPlugin {
 
     }
 
-    async renderSurface(coords: Array<Array<Array<number>>>) {
+    async renderSurface(triangles: Array<Array<Array<number>>>) {
         const structure = this.plugin.build().toRoot();
+        structure.apply(CreateSurface, {
+            index: 0,
+            triangles: triangles,
+            size: 1
+        });
 
-        for (const triangle of coords) {
-            structure.apply(CreateTriangle, {
-                index: 0,
-                vertices: Array().concat(triangle[0], triangle[1], triangle[2]),
-                size: 1
-            });
-        }
+
+        // for (const triangle of coords) {
+        //     structure.apply(CreateTriangle, {
+        //         index: 0,
+        //         vertices: Array().concat(triangle[0], triangle[1], triangle[2]),
+        //         size: 1
+        //     });
+        // }
 
         await structure.commit();
     }
