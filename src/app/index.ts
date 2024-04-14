@@ -25,7 +25,7 @@ import { PluginCommands } from 'Molstar/mol-plugin/commands';
 import { PluginConfig } from 'Molstar/mol-plugin/config';
 import { PluginContext } from 'Molstar/mol-plugin/context';
 import { PluginSpec } from 'Molstar/mol-plugin/spec';
-import { StateSelection, StateTransform } from 'Molstar/mol-state';
+import { StateObjectRef, StateSelection, StateTransform } from 'Molstar/mol-state';
 import { ElementSymbolColorThemeParams } from 'Molstar/mol-theme/color/element-symbol';
 import { Asset } from 'Molstar/mol-util/assets';
 import { Color } from 'Molstar/mol-util/color/color';
@@ -257,21 +257,19 @@ class PDBeMolstarPlugin {
 
     async renderSurface(triangles: Array<Array<Array<number>>>) {
         const structure = this.plugin.build().toRoot();
-        structure.apply(CreateSurface, {
+        const surface = structure.apply(CreateSurface, {
             index: 0,
             triangles: triangles,
             size: 1
         });
 
+        await structure.commit();
+        return surface.ref;
+    }
 
-        // for (const triangle of coords) {
-        //     structure.apply(CreateTriangle, {
-        //         index: 0,
-        //         vertices: Array().concat(triangle[0], triangle[1], triangle[2]),
-        //         size: 1
-        //     });
-        // }
-
+    async deleteSurface(ref: StateObjectRef) {
+        const structure = this.plugin.build().toRoot();
+        structure.delete(ref);
         await structure.commit();
     }
 
