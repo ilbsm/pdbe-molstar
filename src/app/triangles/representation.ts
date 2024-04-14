@@ -41,7 +41,7 @@ function getSurfaceMesh(data: SurfaceData, props: SurfaceProps, mesh?: Mesh) {
 
 function getSurfaceShape(ctx: RuntimeContext, data: SurfaceData, props: SurfaceProps, shape?: Shape<Mesh>) {
     const geo = getSurfaceMesh(data, props, shape && shape.geometry);
-    return Shape.create(`Surface ${data.index}`, data, geo, () => Color.fromRgb(0, 0, 0), () => data.size, () => `Surface ${data.index}`);
+    return Shape.create(`Surface ${data.index}`, data, geo, () => Color.fromRgb(211, 211, 211), () => data.size, () => `Surface ${data.index}`);
 }
 export type SurfaceRepresentation = Representation<SurfaceData, SurfaceParams>
 
