@@ -5,32 +5,34 @@ import { StateTransformer } from 'Molstar/mol-state/transformer';
 import { Task } from 'Molstar/mol-task';
 
 import {
-    SurfaceRepresentation,
-    SurfaceParams
+    BondRepresentation,
+    BondParams
 } from './representation';
 
-const CreateTransformer = StateTransformer.builderFactory('surface-plugin');
+const CreateTransformer = StateTransformer.builderFactory('bond-plugin');
 
 
-export const CreateSurface = CreateTransformer({
-    name: 'create-surface',
-    display: 'Surface',
+export const CreateBond = CreateTransformer({
+    name: 'create-bond',
+    display: 'Bond',
     from: PluginStateObject.Root,
     to: PluginStateObject.Shape.Representation3D,
     params: {
         index: PD.Numeric(0),
-        triangles: PD.Value([] as Array<Array<Array<number>>>),
-        size: PD.Numeric(1.6)
+        begin: PD.Value([] as Array<number>),
+        end: PD.Value([] as Array<number>),
+        size: PD.Numeric(1),
+        color: PD.Value([255, 220, 0] as Array<number>)
     }
 })({
     canAutoUpdate({ oldParams, newParams }) {
         return true;
     },
     apply({ a, params }, plugin: PluginContext) {
-        return Task.create('Surface', async ctx => {
-            const repr = SurfaceRepresentation({ webgl: plugin.canvas3d?.webgl, ...plugin.representation.structure.themes }, () => SurfaceParams);
+        return Task.create('Bond', async ctx => {
+            const repr = BondRepresentation({ webgl: plugin.canvas3d?.webgl, ...plugin.representation.structure.themes }, () => BondParams);
             await repr.createOrUpdate({}, params).runInContext(ctx);
-            return new PluginStateObject.Shape.Representation3D({ repr, sourceData: a }, { label: `Surface ${params.index}` });
+            return new PluginStateObject.Shape.Representation3D({ repr, sourceData: a }, { label: `Bond ${params.index}` });
         });
     }
 });
