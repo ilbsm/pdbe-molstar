@@ -258,19 +258,12 @@ class PDBeMolstarPlugin {
 
     async renderSurface(index: number, triangles: Array<Array<Array<number>>>) {
         const structure = this.plugin.build().toRoot();
-        // if (flip) {
-        //     for (const x of triangles) {
-        //         for (const y of x) {
-        //             y[2] += 10;
-        //         }
-        //     }
-        // }
         const surface = structure.apply(CreateSurface, {
             index: index,
             triangles: triangles
         });
         await structure.commit();
-        return [surface.ref];
+        return surface.ref;
     }
 
     async deleteStructure(ref: StateObjectRef) {

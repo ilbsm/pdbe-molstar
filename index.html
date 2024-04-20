@@ -192,8 +192,10 @@
       // Call render method to display the 3D view
       viewerInstance.render(viewerContainer, options);
       var surface;
+      var bond;
       function deleteLasso(){
-        surface.then(x => viewerInstance.deleteSurface(x));
+        surface.then(x => viewerInstance.deleteStructure(x));
+        bond.then(x => viewerInstance.deleteStructure(x));
       }
       function addLasso(){
         const coords = [[[-23.301, -2.022, 12.006], [-22.8011, -2.54475, 8.41526], [-20.9854, -2.63196, 11.5802]], 
