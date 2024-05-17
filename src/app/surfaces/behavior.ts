@@ -21,7 +21,8 @@ export const CreateSurface = CreateTransformer({
         index: PD.Numeric(0),
         triangles: PD.Value([] as Array<Array<Array<number>>>),
         size: PD.Numeric(1.6),
-        color: PD.Color(Color.fromRgb(72, 72, 72))
+        color: PD.Color(Color.fromRgb(72, 72, 72)),
+        alpha: PD.Numeric(0.9)
     }
 })({
     canAutoUpdate({ oldParams, newParams }) {

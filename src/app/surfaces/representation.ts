@@ -14,7 +14,8 @@ interface SurfaceData {
     triangles: Array<Array<Array<number>>>,
     size: number
     index: number
-    color: Color
+    color: Color,
+    alpha: number
 }
 
 export const SurfaceParams = {
@@ -22,7 +23,7 @@ export const SurfaceParams = {
     doubleSided: PD.Boolean(true),
     // flipSided: PD.Boolean(true),
     xrayShaded: PD.Boolean(false),
-    // alpha: PD.Numeric(60),
+    // alpha: PD.Numeric(0.9),
     transparentBackfaces: PD.Select('on', PD.arrayToOptions(['off', 'on', 'opaque'] as const), BaseGeometry.ShadingCategory), // 'on' means: show backfaces with correct opacity, even when opacity < 1 (requires doubleSided) ¯\_(ツ)_/¯
 };
 export type SurfaceParams = typeof SurfaceParams;
@@ -46,6 +47,7 @@ function getSurfaceMesh(data: SurfaceData, props: SurfaceProps, mesh?: Mesh) {
 }
 
 function getSurfaceShape(ctx: RuntimeContext, data: SurfaceData, props: SurfaceProps, shape?: Shape<Mesh>) {
+    props.alpha = data.alpha;
     const geo = getSurfaceMesh(data, props, shape && shape.geometry);
     return Shape.create(`Surface ${data.index}`, data, geo, () => data.color, () => data.size, () => `Surface ${data.index}`);
 }

@@ -256,11 +256,12 @@ class PDBeMolstarPlugin {
 
     }
 
-    async renderSurface(index: number, triangles: Array<Array<Array<number>>>) {
+    async renderSurface(index: number, triangles: Array<Array<Array<number>>>, alpha?: number) {
         const structure = this.plugin.build().toRoot();
         const surface = structure.apply(CreateSurface, {
             index: index,
-            triangles: triangles
+            triangles: triangles,
+            alpha: alpha
         });
         await structure.commit();
         return surface.ref;
